@@ -142,9 +142,14 @@ export function TunnelSection(props: TunnelSectionProps) {
   onMount(() => {
     void refresh().then(() => loadQr())
     // Reflect the running/starting transition while the tunnel is active.
+    // Also pick up the QR once the URL appears (enable returns while starting).
     timer = setInterval(() => {
       const state = status().state
-      if (state === 'running' || state === 'starting') void refresh()
+      if (state === 'running' || state === 'starting') {
+        void refresh().then(() => {
+          if (uiState() === 'connected' && !qrData()) void loadQr()
+        })
+      }
     }, 2000)
   })
 
@@ -161,8 +166,8 @@ export function TunnelSection(props: TunnelSectionProps) {
           <div class="osp-row-left">
             <div class="osp-row-name">zrok is not installed</div>
             <div class="osp-row-desc">
-              The zrok CLI was not found on PATH. Install it to expose the local dashboard over a
-              private tunnel (HTTPS + basic auth). Example: <code>brew install zrok</code>.
+              The zrok CLI was not found on PATH. Install it to expose your local OpenPi workbench
+              over a private tunnel (HTTPS + basic auth). Example: <code>brew install zrok</code>.
             </div>
           </div>
           <div class="osp-row-right osp-row-right-actions">
@@ -259,8 +264,8 @@ export function TunnelSection(props: TunnelSectionProps) {
               {uiState() === 'starting' ? 'Starting tunnel…' : 'Tunnel is disconnected'}
             </div>
             <div class="osp-row-desc">
-              Start a private zrok tunnel to reach the local dashboard from a browser on another
-              device. Connections require HTTP basic auth.
+              Start a private zrok tunnel to reach this OpenPi workbench from any browser on another
+              device.
             </div>
           </div>
           <div class="osp-row-right osp-row-right-actions">
@@ -283,7 +288,7 @@ export function TunnelSection(props: TunnelSectionProps) {
           <div class="osp-row osp-row-last">
             <div class="osp-row-left">
               <div class="osp-row-name">
-                Tunnel is live
+                OpenPi is live at
                 <Show when={copied()}>
                   <span class="osp-saved-inline">
                     <Check size={10} /> copied
